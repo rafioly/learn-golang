@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
 	"github.com/gorilla/mux"
 )
 
@@ -32,13 +33,21 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 	name := params.Get("name")
 	itemPrice, _ := strconv.Atoi(params.Get("price"))
 
+	if supermarket == nil {
+		supermarket = make(map[string]int)
+	}
+
 	supermarket[name] = itemPrice
 	fmt.Fprintf(w, "Item named %s with price %d has been successfully added", name, itemPrice)
 }
 
 // ListAll : Handler for GET /list_all endpoint
 func ListAll(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(supermarket)
+	if supermarket == nil {
+		fmt.Fprintf(w, "{}")
+	} else {
+		json.NewEncoder(w).Encode(supermarket)
+	}
 }
 
 // DeleteItem : Handler for DELETE / endpoint
